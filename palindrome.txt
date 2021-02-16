@@ -1,0 +1,178 @@
+/******************************************************************************
+
+Welcome to GDB Online.
+GDB online is an online compiler and debugger tool for C, C++, Python, Java, PHP, Ruby, Perl,
+C#, VB, Swift, Pascal, Fortran, Haskell, Objective-C, Assembly, HTML, CSS, JS, SQLite, Prolog.
+Code, Compile, Run and Debug online from anywhere in world.
+
+*******************************************************************************/
+#include <iostream>
+#include <string>
+#include <algorithm>
+#include <sstream>
+
+using namespace std;
+
+
+bool static g_IS_LOG_ENABLE = false;
+
+void EnableDiableLog(bool InIsLog) {
+    g_IS_LOG_ENABLE = InIsLog;
+}
+
+
+bool GetLogVal() {
+    return g_IS_LOG_ENABLE;
+}
+
+
+void Log(string InlogStr) {
+    if (g_IS_LOG_ENABLE == true) { cout << "DEBUG:" << InlogStr << "\n"; }
+}
+
+
+void TrimLeadingAndTrailingSpace(string& InStr) {
+    auto totSize = InStr.size();
+
+    Log("TrimLeadingAndTrailingSpace():Start processing....");
+
+    while (InStr.rfind(" ") == --totSize) { //Right side trim
+        InStr.erase(totSize, totSize + 1);
+    }
+
+    while (InStr.find(" ") == 0) { //Left side trim
+        InStr.erase(0, 1);
+    }
+
+    Log("TrimLeadingAndTrailingSpace():End processing....");
+}
+
+
+bool IsAlphanumeric(string InStr) {
+    bool retVal = true;
+
+    Log("IsAlphanumeric():Starts processing....");
+
+    for (auto ch : InStr) {
+        if (!isalnum(ch)) { //If not alphanumeric then check for valid space character               
+            if (ch == ' ') {
+                retVal = true;
+            }
+            else {
+                retVal = false;
+                break;
+            }
+        }
+        else {
+            //Alpha numeric character
+        }
+    }
+
+    Log("IsAlphanumeric():End processing....");
+    return retVal;
+}
+
+
+// 1. Input is not empty string
+// 2. size of input should not overflow
+// 3. Input string should consists of alphanumeric. Space is allowed in between 
+bool IsValidInput(string& InStr) {
+    bool retVal = true;
+
+    Log("IsValidInput():Start processing....");
+
+    if (InStr.empty()) {
+        retVal = false;
+    }
+    else if (InStr.size() > InStr.max_size()) { // It should not cross max size.
+        retVal = false;
+    }
+    else { // Alphanumeric and space in between pattern are allowed
+        TrimLeadingAndTrailingSpace(InStr);
+        retVal = IsAlphanumeric(InStr);
+    }
+
+    Log("IsValidInput():End processing....");
+    return retVal;
+}
+
+
+bool ProcessStrChars(string InStr) {
+    bool retVal = true;
+
+    string::iterator forwardItr;         // Forward iterator
+    string::reverse_iterator reverseItr; // Reverse Iterator
+
+    forwardItr = InStr.begin();  //Itr pointing start of string
+    reverseItr = InStr.rbegin(); //Itr pointing end of string 
+
+    Log("ProcessStrChars():Start processing....");
+
+    // Comparsion starts from pattern's one character from beginning and one character from end.
+    for ((forwardItr, reverseItr); (forwardItr != InStr.end(), reverseItr != InStr.rend()); (forwardItr++, reverseItr++)) {
+        if (*forwardItr != *reverseItr) {
+            retVal = false;
+            break;
+        }
+        else {
+            //Nothing to do in match case.
+        }
+    }
+
+    Log("ProcessStrChars():End processing....");
+    return retVal;
+}
+
+
+
+//Desc: Function to determine if a word or phrase is a palindrome
+//Arg-1: InStr (string type)
+//Return Value: Returns 'true' if pattern matched else 'false'
+//Author: @Jitendra
+bool IsPalindrome(string InStr) {
+    bool retVal = true;
+    bool retFromInputCheck = true;
+
+    Log("IsPalindrome():Start processing....");
+
+    retFromInputCheck = IsValidInput(InStr);
+
+    if (retFromInputCheck) {
+        transform(InStr.begin(), InStr.end(), InStr.begin(), ::tolower); // convert to lower case   
+
+        retVal = ProcessStrChars(InStr);
+    }
+    else {
+        retVal = false;
+    }
+
+    Log("IsPalindrome(): End processing...");
+    return retVal;
+}
+
+void SetInputBuffer() {
+    cin.clear(); //Restore input stream
+    cin.ignore(5, '\n'); //Flush garbage
+}
+
+int main()
+{
+    bool LoopItr = true;
+    bool retFromPalindrom = false;
+    bool UserInputLog = false;
+    string UserInputStr;
+
+    cout << "###############################################\n";
+    cout << "Enter pattern:";
+
+    getline(cin, UserInputStr);
+    cout << "You entered:" << UserInputStr << "\n\n";
+
+    retFromPalindrom = IsPalindrome(UserInputStr);
+    cout << "-----------------------------------------\n";
+    cout << "IsPalindrome Returned=" << retFromPalindrom << "\n";
+    cout << "\n-----------------------------------------\n";
+    cout << "###############################################\n\n";
+}
+
+
